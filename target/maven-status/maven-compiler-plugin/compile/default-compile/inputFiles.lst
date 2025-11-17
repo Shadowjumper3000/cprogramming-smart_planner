@@ -2,6 +2,10 @@
 /home/dahoe/dev/cprogramming-smart_planner/src/main/java/com/smartplanner/auth/AuthenticationManager.java
 /home/dahoe/dev/cprogramming-smart_planner/src/main/java/com/smartplanner/core/SmartPlannerApplication.java
 /home/dahoe/dev/cprogramming-smart_planner/src/main/java/com/smartplanner/data/FileManager.java
+/home/dahoe/dev/cprogramming-smart_planner/src/main/java/com/smartplanner/model/Task.java
+/home/dahoe/dev/cprogramming-smart_planner/src/main/java/com/smartplanner/model/TimeTableEntry.java
+/home/dahoe/dev/cprogramming-smart_planner/src/main/java/com/smartplanner/service/PlannerService.java
+/home/dahoe/dev/cprogramming-smart_planner/src/main/java/com/smartplanner/service/TimeTableService.java
 /home/dahoe/dev/cprogramming-smart_planner/src/main/java/com/smartplanner/ui/components/BasePage.java
 /home/dahoe/dev/cprogramming-smart_planner/src/main/java/com/smartplanner/ui/components/TablePanel.java
 /home/dahoe/dev/cprogramming-smart_planner/src/main/java/com/smartplanner/ui/pages/ChangePasswordPage.java

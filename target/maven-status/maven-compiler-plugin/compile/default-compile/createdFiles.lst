@@ -4,10 +4,15 @@ com/smartplanner/ui/pages/LandingPage.class
 com/smartplanner/utils/CryptoUtils.class
 com/smartplanner/ui/pages/ChangePasswordPage.class
 com/smartplanner/auth/AuthenticationManager.class
+com/smartplanner/model/Task.class
 com/smartplanner/ui/pages/PlannerPage.class
+com/smartplanner/model/TimeTableEntry.class
+com/smartplanner/service/TimeTableService.class
 com/smartplanner/ui/pages/ChangeUsernamePage.class
 com/smartplanner/Main.class
 com/smartplanner/utils/DataUtils.class
+com/smartplanner/service/PlannerService.class
+com/smartplanner/ui/pages/TimeTablePage$1.class
 com/smartplanner/validation/DateFormatValidator.class
 com/smartplanner/ui/components/TablePanel.class
 com/smartplanner/ui/pages/LoginPage.class
@@ -16,3 +21,4 @@ com/smartplanner/ui/pages/MainPage.class
 com/smartplanner/ui/pages/SignUpPage.class
 com/smartplanner/ui/pages/TimeTablePage.class
 com/smartplanner/data/FileManager.class
+com/smartplanner/ui/pages/PlannerPage$1.class
