@@ -14,10 +14,12 @@ public class Task {
   private LocalTime dueTime;
   private String priority; // High, Medium, Low
   private boolean completed;
+  private boolean isLate;
   private String category;
 
   public Task() {
     this.completed = false;
+    this.isLate = false;
     this.priority = "Medium";
   }
 
@@ -30,6 +32,7 @@ public class Task {
     this.dueTime = dueTime;
     this.priority = priority;
     this.completed = completed;
+    this.isLate = false;
     this.category = category;
   }
 
@@ -89,6 +92,10 @@ public class Task {
   public void setCompleted(boolean completed) {
     this.completed = completed;
   }
+
+  public boolean isLate() {return isLate;}
+
+    public void setLate(boolean isLate) {this.isLate = isLate;}
 
   public String getCategory() {
     return category;
