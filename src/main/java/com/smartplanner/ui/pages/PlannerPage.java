@@ -24,7 +24,7 @@ public class PlannerPage extends BasePage implements ActionListener {
     private JTextField titleField, descriptionField, dueDateField, dueTimeField, categoryField;
     private JComboBox<String> priorityComboBox, filterComboBox;
     private JTextField searchField;
-    private JButton addButton, editButton, deleteButton, markCompleteButton, searchButton, refreshButton, reportButton;
+    private JButton addButton, editButton, deleteButton, markCompleteButton, searchButton, refreshButton, reportButton, emailSettingsButton;
     private JCheckBox showCompletedCheckbox;
 
     public PlannerPage(String userID) {
@@ -62,6 +62,7 @@ public class PlannerPage extends BasePage implements ActionListener {
         markCompleteButton = new JButton("Toggle Complete");
         refreshButton = new JButton("Refresh");
         reportButton = new JButton("Generate Report");
+        emailSettingsButton = new JButton("Email Settings");
 
         // Search and filter components
         searchField = new JTextField(15);
@@ -100,6 +101,7 @@ public class PlannerPage extends BasePage implements ActionListener {
         searchButton.addActionListener(this);
         refreshButton.addActionListener(this);
         reportButton.addActionListener(e -> new ReportPage(userID));
+        emailSettingsButton.addActionListener(this);
         filterComboBox.addActionListener(this);
         showCompletedCheckbox.addActionListener(this);
     }
@@ -155,6 +157,7 @@ public class PlannerPage extends BasePage implements ActionListener {
         buttonPanel.add(markCompleteButton);
         buttonPanel.add(refreshButton);
         buttonPanel.add(reportButton);
+        buttonPanel.add(emailSettingsButton);
 
         // Search and filter panel
         JPanel searchPanel = new JPanel(new FlowLayout());
@@ -429,6 +432,9 @@ public class PlannerPage extends BasePage implements ActionListener {
             plannerService.loadTasks();
             searchField.setText("");
             loadTasksIntoTable();
+        } else if (e.getSource() == emailSettingsButton) {
+            new EmailSettingsPage(userID);
+            frame.dispose();
         } else if (e.getSource() == filterComboBox || e.getSource() == showCompletedCheckbox) {
             loadTasksIntoTable();
         }

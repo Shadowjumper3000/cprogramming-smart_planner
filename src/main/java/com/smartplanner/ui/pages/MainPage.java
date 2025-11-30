@@ -15,10 +15,8 @@ public class MainPage extends BasePage implements ActionListener {
 
     private JMenuBar menuBar;
     private JMenu profileMenu;
-    private JMenu settingsMenu;
     private JMenuItem changeProfileName;
     private JMenuItem changeProfilePassword;
-    private JMenuItem emailSettings;
 
     public MainPage(String userID) {
         this.userID = userID;
@@ -35,10 +33,8 @@ public class MainPage extends BasePage implements ActionListener {
         
         menuBar = new JMenuBar();
         profileMenu = new JMenu(userID);
-        settingsMenu = new JMenu("Settings");
         changeProfileName = new JMenuItem("Change profile name");
         changeProfilePassword = new JMenuItem("Change profile password");
-        emailSettings = new JMenuItem("Email Settings");
     }
 
     private void setupLayout() {
@@ -59,20 +55,16 @@ public class MainPage extends BasePage implements ActionListener {
         // Add action listeners to menu items
         changeProfileName.addActionListener(this);
         changeProfilePassword.addActionListener(this);
-        emailSettings.addActionListener(this);
 
         // Build menu structure
         profileMenu.add(changeProfileName);
         profileMenu.add(changeProfilePassword);
-        settingsMenu.add(emailSettings);
         menuBar.add(profileMenu);
-        menuBar.add(settingsMenu);
 
         // Set menu bar and keyboard shortcuts
         frame.setJMenuBar(menuBar);
         changeProfilePassword.setMnemonic(KeyEvent.VK_P);
         changeProfileName.setMnemonic(KeyEvent.VK_N);
-        emailSettings.setMnemonic(KeyEvent.VK_E);
     }
 
     @Override
@@ -84,9 +76,6 @@ public class MainPage extends BasePage implements ActionListener {
         } else if (e.getSource() == changeProfilePassword) {
             AuthenticationManager authManager = new AuthenticationManager();
             new ChangePasswordPage(authManager.getLoginInfo(), this.userID);
-            frame.dispose();
-        } else if (e.getSource() == emailSettings) {
-            new EmailSettingsPage(this.userID);
             frame.dispose();
         } else if (e.getSource() == button1) {
             new PlannerPage(this.userID);

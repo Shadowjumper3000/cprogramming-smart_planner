@@ -163,7 +163,7 @@ public class EmailSettingsPage extends BasePage implements ActionListener {
         } else if (e.getSource() == testButton) {
             testEmailSettings();
         } else if (e.getSource() == backButton) {
-            new MainPage(userID);
+            new PlannerPage(userID);
             frame.dispose();
         }
     }
