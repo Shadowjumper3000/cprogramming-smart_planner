@@ -16,40 +16,35 @@ The SmartPlanner Email Reminder System automatically sends email notifications f
 ### 1. Configure Email Settings
 
 1. **Launch SmartPlanner** and log in
-2. **Navigate to Settings → Email Settings** from the main menu
-3. **Fill in your email configuration:**
+2. **Go to Planner → Email Settings** button
+3. **Fill in the simple form:**
 
-   For **Gmail** users:
-   - SMTP Host: `smtp.gmail.com`
-   - SMTP Port: `587`
-   - Use TLS: ✓ (checked)
-   - Email Username: Your full Gmail address (e.g., `yourname@gmail.com`)
-   - Email Password: Your **App Password** (see below)
-   - From Email: Your Gmail address
-   - To Email: Email address where you want to receive reminders
+   **Basic Setup (Required):**
+   - **Your Email**: Your full email address (e.g., `yourname@gmail.com`)
+   - **Send Reminders To**: Where to receive reminders (can be the same email)
+   - **Email Password**: Your regular email password
 
-   For **Other Email Providers**:
-   - Consult your email provider's SMTP settings
-   - Common providers:
-     - **Outlook.com**: `smtp-mail.outlook.com`, port `587`
-     - **Yahoo Mail**: `smtp.mail.yahoo.com`, port `587`
-     - **Custom Domain**: Check with your email administrator
+   **That's it!** The default settings work for most email providers (Gmail, Outlook, Yahoo, etc.)
+
+   **Advanced Settings** (optional - click "▼ Advanced Settings" to expand):
+   - SMTP Host: Default is `smtp.gmail.com` (auto-configured for Gmail)
+   - SMTP Port: Default is `587` (standard for most providers)
+   - Use TLS: Enabled by default (recommended)
+   - Username: Auto-filled from your email
 
 4. **Click "Save Settings"**
 5. **Click "Send Test Email"** to verify your configuration
 
-### 2. Gmail App Password Setup
+### 2. Email Provider Notes
 
-⚠️ **Important**: Gmail requires App Passwords for third-party applications.
+**Gmail Users:**
+- Works with regular password for most accounts
+- If you have 2-Step Verification enabled, you may need an App Password (see troubleshooting)
 
-1. Go to your Google Account: https://myaccount.google.com/
-2. Navigate to **Security**
-3. Enable **2-Step Verification** (if not already enabled)
-4. Go to **Security → 2-Step Verification → App passwords**
-5. Select **Mail** and **Windows Computer** (or Other)
-6. Click **Generate**
-7. Copy the 16-character password (no spaces)
-8. Use this password in SmartPlanner's "Email Password" field
+**Other Providers:**
+- **Outlook.com**: Works with regular password (SMTP: `smtp-mail.outlook.com`)
+- **Yahoo Mail**: Works with regular password (SMTP: `smtp.mail.yahoo.com`)
+- Most email providers work with default settings
 
 ### 3. Enable Reminders for Tasks
 
@@ -114,12 +109,16 @@ Reminder emails include:
 4. **Reminder Timing**: The reminder is sent at the calculated time (e.g., 30 minutes before due time)
 5. **Check Spam Folder**: Reminder emails may be filtered to spam
 
-### Gmail "Less Secure App" Error
+### Gmail "Authentication Failed" Error
 
-Gmail no longer supports "Less Secure Apps". You **must** use an App Password:
-1. Enable 2-Step Verification on your Google Account
-2. Generate an App Password (see instructions above)
-3. Use the App Password in SmartPlanner
+**If using 2-Step Verification**, you'll need an App Password:
+1. Go to https://myaccount.google.com/security
+2. Enable 2-Step Verification (if not already enabled)
+3. Go to "App passwords" 
+4. Generate a new password for "Mail" / "Windows Computer"
+5. Use this 16-character password in SmartPlanner instead of your regular password
+
+**Without 2-Step Verification**: Your regular password should work
 
 ## Technical Details
 

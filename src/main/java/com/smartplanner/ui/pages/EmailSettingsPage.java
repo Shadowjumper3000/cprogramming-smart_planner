@@ -83,67 +83,103 @@ public class EmailSettingsPage extends BasePage implements ActionListener {
         frame.setLayout(null);
 
         // Title
-        titleLabel.setBounds(50, 20, 300, 30);
+        titleLabel.setBounds(50, 20, 400, 30);
         frame.add(titleLabel);
 
-        // SMTP Host
-        smtpHostLabel.setBounds(50, 70, 150, 25);
-        smtpHostField.setBounds(200, 70, 250, 25);
-        frame.add(smtpHostLabel);
-        frame.add(smtpHostField);
+        // Instructions panel
+        JTextArea instructions = new JTextArea(
+            "SIMPLE SETUP:\n\n" +
+            "1. Your Email: Enter the email you want to send reminders FROM\n" +
+            "2. Send To: Enter where you want reminders sent (can be same email)\n" +
+            "3. Password: Your regular email password\n\n" +
+            "Default settings work for most email providers!"
+        );
+        instructions.setBounds(50, 60, 480, 120);
+        instructions.setEditable(false);
+        instructions.setBackground(new Color(255, 255, 200));
+        instructions.setFont(new Font("Arial", Font.PLAIN, 11));
+        instructions.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+        frame.add(instructions);
 
-        // SMTP Port
-        smtpPortLabel.setBounds(50, 105, 150, 25);
-        smtpPortField.setBounds(200, 105, 250, 25);
-        frame.add(smtpPortLabel);
-        frame.add(smtpPortField);
-
-        // Use TLS
-        useTLSLabel.setBounds(50, 140, 150, 25);
-        useTLSCheckbox.setBounds(200, 140, 25, 25);
-        frame.add(useTLSLabel);
-        frame.add(useTLSCheckbox);
-
-        // Username
-        usernameLabel.setBounds(50, 175, 150, 25);
-        usernameField.setBounds(200, 175, 250, 25);
-        frame.add(usernameLabel);
-        frame.add(usernameField);
-
-        // Password
-        passwordLabel.setBounds(50, 210, 150, 25);
-        passwordField.setBounds(200, 210, 250, 25);
-        frame.add(passwordLabel);
-        frame.add(passwordField);
-
-        // From Email
-        fromEmailLabel.setBounds(50, 245, 150, 25);
-        fromEmailField.setBounds(200, 245, 250, 25);
-        frame.add(fromEmailLabel);
+        // Your Email (simplified - combines username and from)
+        JLabel yourEmailLabel = new JLabel("Your Email:");
+        yourEmailLabel.setBounds(50, 195, 150, 25);
+        yourEmailLabel.setFont(new Font("Arial", Font.BOLD, 12));
+        frame.add(yourEmailLabel);
+        
+        fromEmailField.setBounds(200, 195, 330, 25);
         frame.add(fromEmailField);
 
-        // To Email
-        toEmailLabel.setBounds(50, 280, 150, 25);
-        toEmailField.setBounds(200, 280, 250, 25);
-        frame.add(toEmailLabel);
+        // Send To Email
+        JLabel sendToLabel = new JLabel("Send Reminders To:");
+        sendToLabel.setBounds(50, 230, 150, 25);
+        sendToLabel.setFont(new Font("Arial", Font.BOLD, 12));
+        frame.add(sendToLabel);
+        
+        toEmailField.setBounds(200, 230, 330, 25);
         frame.add(toEmailField);
 
-        // Info label
-        JLabel infoLabel = new JLabel("<html>Note: For Gmail, use 'smtp.gmail.com' port 587<br/>" +
-                                      "and enable 'App Passwords' in your Google account.</html>");
-        infoLabel.setBounds(50, 315, 400, 40);
-        infoLabel.setFont(new Font("Arial", Font.ITALIC, 10));
-        frame.add(infoLabel);
+        // Password
+        JLabel passLabel = new JLabel("Email Password:");
+        passLabel.setBounds(50, 265, 150, 25);
+        passLabel.setFont(new Font("Arial", Font.BOLD, 12));
+        frame.add(passLabel);
+        
+        passwordField.setBounds(200, 265, 330, 25);
+        frame.add(passwordField);
+
+        // Advanced settings toggle
+        JButton advancedButton = new JButton("▼ Advanced Settings");
+        advancedButton.setBounds(50, 305, 180, 30);
+        advancedButton.setFocusable(false);
+        
+        JPanel advancedPanel = new JPanel(null);
+        advancedPanel.setBounds(50, 345, 480, 130);
+        advancedPanel.setBorder(BorderFactory.createTitledBorder("Advanced"));
+        advancedPanel.setVisible(false);
+
+        // SMTP Host (in advanced)
+        smtpHostLabel.setBounds(10, 25, 100, 25);
+        smtpHostField.setBounds(120, 25, 200, 25);
+        advancedPanel.add(smtpHostLabel);
+        advancedPanel.add(smtpHostField);
+
+        // SMTP Port (in advanced)
+        smtpPortLabel.setBounds(10, 60, 100, 25);
+        smtpPortField.setBounds(120, 60, 80, 25);
+        advancedPanel.add(smtpPortLabel);
+        advancedPanel.add(smtpPortField);
+
+        // Username (in advanced, hidden by default)
+        usernameLabel.setBounds(10, 95, 100, 25);
+        usernameField.setBounds(120, 95, 200, 25);
+        advancedPanel.add(usernameLabel);
+        advancedPanel.add(usernameField);
+
+        // Use TLS (in advanced)
+        useTLSLabel.setBounds(240, 60, 80, 25);
+        useTLSCheckbox.setBounds(320, 60, 25, 25);
+        advancedPanel.add(useTLSLabel);
+        advancedPanel.add(useTLSCheckbox);
+
+        advancedButton.addActionListener(e -> {
+            advancedPanel.setVisible(!advancedPanel.isVisible());
+            advancedButton.setText(advancedPanel.isVisible() ? "▲ Advanced Settings" : "▼ Advanced Settings");
+            frame.setSize(580, advancedPanel.isVisible() ? 580 : 480);
+        });
+
+        frame.add(advancedButton);
+        frame.add(advancedPanel);
 
         // Buttons
-        saveButton.setBounds(50, 370, 130, 35);
-        testButton.setBounds(190, 370, 150, 35);
-        backButton.setBounds(350, 370, 100, 35);
+        saveButton.setBounds(50, 345, 130, 35);
+        testButton.setBounds(190, 345, 150, 35);
+        backButton.setBounds(350, 345, 100, 35);
         frame.add(saveButton);
         frame.add(testButton);
         frame.add(backButton);
 
-        frame.setSize(500, 500);
+        frame.setSize(580, 480);
     }
 
     private void loadCurrentSettings() {
@@ -170,11 +206,18 @@ public class EmailSettingsPage extends BasePage implements ActionListener {
 
     private void saveSettings() {
         try {
+            String fromEmail = fromEmailField.getText().trim();
+            
+            // Auto-sync username with from email if username is empty
+            if (usernameField.getText().trim().isEmpty()) {
+                usernameField.setText(fromEmail);
+            }
+            
             emailConfig.setSmtpHost(smtpHostField.getText().trim());
             emailConfig.setSmtpPort(Integer.parseInt(smtpPortField.getText().trim()));
             emailConfig.setUsername(usernameField.getText().trim());
             emailConfig.setPassword(new String(passwordField.getPassword()));
-            emailConfig.setFromEmail(fromEmailField.getText().trim());
+            emailConfig.setFromEmail(fromEmail);
             emailConfig.setToEmail(toEmailField.getText().trim());
             emailConfig.setUseTLS(useTLSCheckbox.isSelected());
 
