@@ -24,7 +24,7 @@ public class PlannerPage extends BasePage implements ActionListener {
     private JTextField titleField, descriptionField, dueDateField, dueTimeField, categoryField;
     private JComboBox<String> priorityComboBox, filterComboBox;
     private JTextField searchField;
-    private JButton addButton, editButton, deleteButton, markCompleteButton, searchButton, refreshButton;
+    private JButton addButton, editButton, deleteButton, markCompleteButton, searchButton, refreshButton, reportButton;
     private JCheckBox showCompletedCheckbox;
 
     public PlannerPage(String userID) {
@@ -61,6 +61,7 @@ public class PlannerPage extends BasePage implements ActionListener {
         deleteButton = new JButton("Delete Task");
         markCompleteButton = new JButton("Toggle Complete");
         refreshButton = new JButton("Refresh");
+        reportButton = new JButton("Generate Report");
 
         // Search and filter components
         searchField = new JTextField(15);
@@ -98,6 +99,7 @@ public class PlannerPage extends BasePage implements ActionListener {
         markCompleteButton.addActionListener(this);
         searchButton.addActionListener(this);
         refreshButton.addActionListener(this);
+        reportButton.addActionListener(e -> new ReportPage(userID));
         filterComboBox.addActionListener(this);
         showCompletedCheckbox.addActionListener(this);
     }
@@ -152,6 +154,7 @@ public class PlannerPage extends BasePage implements ActionListener {
         buttonPanel.add(deleteButton);
         buttonPanel.add(markCompleteButton);
         buttonPanel.add(refreshButton);
+        buttonPanel.add(reportButton);
 
         // Search and filter panel
         JPanel searchPanel = new JPanel(new FlowLayout());

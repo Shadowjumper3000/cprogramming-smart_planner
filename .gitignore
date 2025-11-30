@@ -23,6 +23,9 @@
 hs_err_pid*
 replay_pid*
 
+#for Intelij
+.idea/
+
 # CSV files
 data/
 *.csv
