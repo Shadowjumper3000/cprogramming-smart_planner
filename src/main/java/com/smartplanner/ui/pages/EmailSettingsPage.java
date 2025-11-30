@@ -208,14 +208,12 @@ public class EmailSettingsPage extends BasePage implements ActionListener {
         try {
             String fromEmail = fromEmailField.getText().trim();
             
-            // Auto-sync username with from email if username is empty
-            if (usernameField.getText().trim().isEmpty()) {
-                usernameField.setText(fromEmail);
-            }
+            // ALWAYS sync username with from email (most email servers use full email as username)
+            usernameField.setText(fromEmail);
             
             emailConfig.setSmtpHost(smtpHostField.getText().trim());
             emailConfig.setSmtpPort(Integer.parseInt(smtpPortField.getText().trim()));
-            emailConfig.setUsername(usernameField.getText().trim());
+            emailConfig.setUsername(fromEmail); // Use full email address as username
             emailConfig.setPassword(new String(passwordField.getPassword()));
             emailConfig.setFromEmail(fromEmail);
             emailConfig.setToEmail(toEmailField.getText().trim());
@@ -224,10 +222,23 @@ public class EmailSettingsPage extends BasePage implements ActionListener {
             emailConfig.saveConfig();
             emailService.setConfig(emailConfig);
 
-            JOptionPane.showMessageDialog(frame,
-                    "Email settings saved successfully!",
-                    "Success",
-                    JOptionPane.INFORMATION_MESSAGE);
+            // Show Gmail-specific warning if needed
+            if (fromEmail.toLowerCase().contains("@gmail.com")) {
+                JOptionPane.showMessageDialog(frame,
+                        "Settings saved!\n\n" +
+                        "⚠️ GMAIL USERS: If test fails, you need an App Password:\n" +
+                        "1. Go to myaccount.google.com/security\n" +
+                        "2. Enable 2-Step Verification\n" +
+                        "3. Create an App Password for 'Mail'\n" +
+                        "4. Use that 16-character password here instead",
+                        "Gmail Setup Required",
+                        JOptionPane.WARNING_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(frame,
+                        "Email settings saved successfully!",
+                        "Success",
+                        JOptionPane.INFORMATION_MESSAGE);
+            }
 
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(frame,
@@ -284,16 +295,35 @@ public class EmailSettingsPage extends BasePage implements ActionListener {
                     Throwable cause = ex.getCause();
                     String message = cause != null ? cause.getMessage() : ex.getMessage();
                     
+                    // Check if it's a Gmail authentication issue
+                    boolean isGmail = fromEmailField.getText().toLowerCase().contains("@gmail.com");
+                    boolean isAuthError = message != null && (message.contains("535") || message.contains("authentication"));
+                    
                     // Create detailed error message
                     StringBuilder errorMsg = new StringBuilder();
-                    errorMsg.append("Failed to send test email.\n\n");
-                    errorMsg.append("Error: ").append(message).append("\n\n");
-                    errorMsg.append("Common solutions:\n");
-                    errorMsg.append("• Check your email and password are correct\n");
-                    errorMsg.append("• Verify internet connection\n");
-                    errorMsg.append("• Gmail with 2FA: Use an App Password\n");
-                    errorMsg.append("• Try expanding Advanced Settings and checking SMTP details\n\n");
-                    errorMsg.append("Check the console output for detailed logs.");
+                    errorMsg.append("❌ Failed to send test email.\n\n");
+                    
+                    if (isGmail && isAuthError) {
+                        errorMsg.append("⚠️ GMAIL REQUIRES APP PASSWORD:\n\n");
+                        errorMsg.append("Gmail blocks regular passwords for security.\n");
+                        errorMsg.append("You MUST use an App Password:\n\n");
+                        errorMsg.append("1. Visit: myaccount.google.com/security\n");
+                        errorMsg.append("2. Enable '2-Step Verification'\n");
+                        errorMsg.append("3. Go to '2-Step Verification' → 'App passwords'\n");
+                        errorMsg.append("4. Select 'Mail' and 'Windows Computer'\n");
+                        errorMsg.append("5. Copy the 16-character password\n");
+                        errorMsg.append("6. Paste it in the 'Email Password' field\n\n");
+                        errorMsg.append("Your regular Gmail password will NOT work!");
+                    } else {
+                        errorMsg.append("Error: ").append(message).append("\n\n");
+                        errorMsg.append("Common solutions:\n");
+                        errorMsg.append("• Check your email and password are correct\n");
+                        errorMsg.append("• Verify internet connection\n");
+                        if (isGmail) {
+                            errorMsg.append("• Gmail: You MUST use an App Password\n");
+                        }
+                        errorMsg.append("• Check Advanced Settings (SMTP, port, etc.)\n");
+                    }
                     
                     JOptionPane.showMessageDialog(frame,
                             errorMsg.toString(),
