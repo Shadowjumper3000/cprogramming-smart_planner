@@ -143,7 +143,7 @@ public class EmailSettingsPage extends BasePage implements ActionListener {
         frame.add(testButton);
         frame.add(backButton);
 
-        frame.setSize(500, 470);
+        frame.setSize(500, 500);
     }
 
     private void loadCurrentSettings() {
