@@ -84,7 +84,7 @@ public class EmailService {
   public boolean sendEmail(String subject, String body) {
     if (!config.isValid()) {
       System.err.println("Email configuration is not valid.");
-      return false;
+      throw new RuntimeException("Email configuration incomplete. Please fill in all required fields.");
     }
 
     Properties props = new Properties();
@@ -93,6 +93,13 @@ public class EmailService {
     props.put("mail.smtp.host", config.getSmtpHost());
     props.put("mail.smtp.port", String.valueOf(config.getSmtpPort()));
     props.put("mail.smtp.ssl.trust", config.getSmtpHost());
+    props.put("mail.smtp.ssl.protocols", "TLSv1.2");
+    props.put("mail.smtp.connectiontimeout", "10000");
+    props.put("mail.smtp.timeout", "10000");
+    props.put("mail.smtp.writetimeout", "10000");
+    
+    // Enable debug mode for troubleshooting
+    props.put("mail.debug", "true");
 
     Session session = Session.getInstance(props, new Authenticator() {
       @Override
@@ -108,6 +115,11 @@ public class EmailService {
       message.setSubject(subject);
       message.setText(body);
 
+      System.out.println("Attempting to send email...");
+      System.out.println("From: " + config.getFromEmail());
+      System.out.println("To: " + config.getToEmail());
+      System.out.println("SMTP: " + config.getSmtpHost() + ":" + config.getSmtpPort());
+      
       Transport.send(message);
       System.out.println("Email sent successfully!");
       return true;
@@ -115,7 +127,20 @@ public class EmailService {
     } catch (MessagingException e) {
       System.err.println("Failed to send email: " + e.getMessage());
       e.printStackTrace();
-      return false;
+      
+      // Provide more specific error messages
+      String errorMsg = e.getMessage();
+      if (errorMsg != null) {
+        if (errorMsg.contains("authentication failed") || errorMsg.contains("535")) {
+          throw new RuntimeException("Authentication failed. Check your email and password.\n" +
+                                   "Gmail users: You may need an App Password if 2-Step Verification is enabled.", e);
+        } else if (errorMsg.contains("Could not connect") || errorMsg.contains("timeout")) {
+          throw new RuntimeException("Cannot connect to email server. Check your internet connection.", e);
+        } else if (errorMsg.contains("Unknown SMTP host")) {
+          throw new RuntimeException("Invalid SMTP host: " + config.getSmtpHost(), e);
+        }
+      }
+      throw new RuntimeException("Email send failed: " + errorMsg, e);
     }
   }
 

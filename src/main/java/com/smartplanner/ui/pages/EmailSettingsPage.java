@@ -256,9 +256,16 @@ public class EmailSettingsPage extends BasePage implements ActionListener {
 
         // Send email in a separate thread
         SwingWorker<Boolean, Void> worker = new SwingWorker<Boolean, Void>() {
+            private String errorDetails = "";
+            
             @Override
             protected Boolean doInBackground() throws Exception {
-                return emailService.sendTestEmail();
+                try {
+                    return emailService.sendTestEmail();
+                } catch (Exception e) {
+                    errorDetails = e.getMessage();
+                    throw e;
+                }
             }
 
             @Override
@@ -268,19 +275,29 @@ public class EmailSettingsPage extends BasePage implements ActionListener {
                     boolean success = get();
                     if (success) {
                         JOptionPane.showMessageDialog(frame,
-                                "Test email sent successfully!\nCheck your inbox.",
+                                "✓ Test email sent successfully!\n\nCheck your inbox (and spam folder).",
                                 "Success",
                                 JOptionPane.INFORMATION_MESSAGE);
-                    } else {
-                        JOptionPane.showMessageDialog(frame,
-                                "Failed to send test email.\nPlease check your settings and try again.",
-                                "Error",
-                                JOptionPane.ERROR_MESSAGE);
                     }
                 } catch (Exception ex) {
+                    // Get the root cause message
+                    Throwable cause = ex.getCause();
+                    String message = cause != null ? cause.getMessage() : ex.getMessage();
+                    
+                    // Create detailed error message
+                    StringBuilder errorMsg = new StringBuilder();
+                    errorMsg.append("Failed to send test email.\n\n");
+                    errorMsg.append("Error: ").append(message).append("\n\n");
+                    errorMsg.append("Common solutions:\n");
+                    errorMsg.append("• Check your email and password are correct\n");
+                    errorMsg.append("• Verify internet connection\n");
+                    errorMsg.append("• Gmail with 2FA: Use an App Password\n");
+                    errorMsg.append("• Try expanding Advanced Settings and checking SMTP details\n\n");
+                    errorMsg.append("Check the console output for detailed logs.");
+                    
                     JOptionPane.showMessageDialog(frame,
-                            "Error sending test email: " + ex.getMessage(),
-                            "Error",
+                            errorMsg.toString(),
+                            "Email Test Failed",
                             JOptionPane.ERROR_MESSAGE);
                 }
             }
