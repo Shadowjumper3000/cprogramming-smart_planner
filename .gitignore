@@ -30,4 +30,18 @@ replay_pid*
 data/
 *.csv
 
+# build outputs
+bin/
+target/
+
+# IDE metadata
+.project
+.classpath
+.settings/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+
 target/
