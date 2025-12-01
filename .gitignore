@@ -29,6 +29,7 @@ data/
 
 # build outputs
 bin/
+target/
 
 # IDE metadata
 .project
