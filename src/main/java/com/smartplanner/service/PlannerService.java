@@ -1,6 +1,7 @@
 package com.smartplanner.service;
 
 import com.smartplanner.model.Task;
+import com.smartplanner.model.TaskReport;
 
 import java.io.*;
 import java.time.LocalDate;
@@ -205,4 +206,13 @@ public class PlannerService {
         .filter(category -> !category.trim().isEmpty())
         .collect(Collectors.toSet());
   }
+
+    public TaskReport generateReport() {
+        List<Task> pending = getTasksByCompletion(false);
+        List<Task> late = getOverdueTasks();
+        List<Task> completed = getTasksByCompletion(true);
+
+        return new TaskReport(pending, late, completed);
+    }
+
 }
