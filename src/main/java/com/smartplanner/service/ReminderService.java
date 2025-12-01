@@ -70,6 +70,8 @@ public class ReminderService {
     try {
       List<Task> tasks = plannerService.getAllTasks();
       LocalDateTime now = LocalDateTime.now();
+      
+      System.out.println("Checking reminders at: " + now);
 
       for (Task task : tasks) {
         // Skip if task is completed or reminder is not enabled
@@ -85,16 +87,21 @@ public class ReminderService {
         // Calculate when the task is due
         LocalDateTime taskDueTime = LocalDateTime.of(task.getDueDate(), task.getDueTime());
         
+        System.out.println("Task: " + task.getTitle() + " | Due: " + taskDueTime + " | Reminder enabled: " + task.isEmailReminderEnabled());
+        
         // Check 1: Send advance reminder (before deadline)
         LocalDateTime reminderTime = taskDueTime.minusMinutes(task.getReminderMinutesBefore());
         long minutesUntilReminder = ChronoUnit.MINUTES.between(now, reminderTime);
         String reminderKey = task.getId() + "_reminder_" + reminderTime.toString();
+        
+        System.out.println("  Advance reminder: " + minutesUntilReminder + " minutes until reminder time");
         
         if (minutesUntilReminder <= 0 && 
             minutesUntilReminder > -60 && // Don't send if more than 1 hour past reminder time
             !sentReminders.contains(reminderKey) &&
             taskDueTime.isAfter(now)) {
           
+          System.out.println("  -> Sending UPCOMING reminder!");
           sendReminder(task, "UPCOMING");
           sentReminders.add(reminderKey);
         }
@@ -103,10 +110,13 @@ public class ReminderService {
         long minutesUntilDeadline = ChronoUnit.MINUTES.between(now, taskDueTime);
         String deadlineKey = task.getId() + "_deadline_" + taskDueTime.toString();
         
+        System.out.println("  Deadline check: " + minutesUntilDeadline + " minutes until deadline | Already sent: " + sentReminders.contains(deadlineKey));
+        
         if (minutesUntilDeadline <= 0 && 
             minutesUntilDeadline > -60 && // Send within 1 hour after deadline
             !sentReminders.contains(deadlineKey)) {
           
+          System.out.println("  -> Sending DEADLINE reminder!");
           sendReminder(task, "DEADLINE");
           sentReminders.add(deadlineKey);
         }

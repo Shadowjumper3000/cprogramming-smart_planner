@@ -327,43 +327,33 @@ public class PlannerPage extends BasePage implements ActionListener {
             frame.dispose();
             new MainPage(userID);
         } else if (e.getSource() == addButton) {
-            Task task = createTaskFromForm();
-            if (task != null && !task.getTitle().isEmpty()) {
+            TaskReminderDialog dialog = new TaskReminderDialog(frame);
+            dialog.setVisible(true);
+            
+            if (dialog.isSaved()) {
+                Task task = dialog.getTask();
                 plannerService.addTask(task);
                 clearForm();
                 loadTasksIntoTable();
                 JOptionPane.showMessageDialog(frame, "Task added successfully!", "Success",
                         JOptionPane.INFORMATION_MESSAGE);
-            } else {
-                JOptionPane.showMessageDialog(frame, "Please enter a task title.", "Error", JOptionPane.ERROR_MESSAGE);
             }
         } else if (e.getSource() == editButton) {
             int selectedRow = taskTable.getSelectedRow();
             if (selectedRow != -1) {
-                // First, load the selected task into the form if it's empty
-                if (isFormEmpty()) {
-                    loadSelectedTaskIntoForm();
-                    JOptionPane.showMessageDialog(frame,
-                            "Task loaded into form. Make changes and click 'Edit Task' again to save.",
-                            "Edit Mode", JOptionPane.INFORMATION_MESSAGE);
-                } else {
-                    // Form has data, so update the selected task
-                    Task task = createTaskFromForm();
-                    if (task != null && !task.getTitle().isEmpty()) {
-                        List<Task> filteredTasks = getCurrentFilteredTasks();
-                        if (selectedRow < filteredTasks.size()) {
-                            Task originalTask = filteredTasks.get(selectedRow);
-                            task.setId(originalTask.getId());
-                            task.setCompleted(originalTask.isCompleted());
-                            plannerService.updateTask(task);
-                            clearForm();
-                            loadTasksIntoTable();
-                            JOptionPane.showMessageDialog(frame, "Task updated successfully!", "Success",
-                                    JOptionPane.INFORMATION_MESSAGE);
-                        }
-                    } else {
-                        JOptionPane.showMessageDialog(frame, "Please enter a task title.", "Error",
-                                JOptionPane.ERROR_MESSAGE);
+                List<Task> filteredTasks = getCurrentFilteredTasks();
+                if (selectedRow < filteredTasks.size()) {
+                    Task taskToEdit = filteredTasks.get(selectedRow);
+                    TaskReminderDialog dialog = new TaskReminderDialog(frame, taskToEdit);
+                    dialog.setVisible(true);
+                    
+                    if (dialog.isSaved()) {
+                        Task updatedTask = dialog.getTask();
+                        plannerService.updateTask(updatedTask);
+                        clearForm();
+                        loadTasksIntoTable();
+                        JOptionPane.showMessageDialog(frame, "Task updated successfully!", "Success",
+                                JOptionPane.INFORMATION_MESSAGE);
                     }
                 }
             } else {
