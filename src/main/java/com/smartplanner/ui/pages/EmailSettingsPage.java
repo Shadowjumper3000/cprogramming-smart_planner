@@ -165,7 +165,7 @@ public class EmailSettingsPage extends BasePage implements ActionListener {
         advancedButton.addActionListener(e -> {
             advancedPanel.setVisible(!advancedPanel.isVisible());
             advancedButton.setText(advancedPanel.isVisible() ? "▲ Advanced Settings" : "▼ Advanced Settings");
-            frame.setSize(580, advancedPanel.isVisible() ? 580 : 480);
+            // No need to resize - frame is resizable and maximized
         });
 
         frame.add(advancedButton);
@@ -179,7 +179,17 @@ public class EmailSettingsPage extends BasePage implements ActionListener {
         frame.add(testButton);
         frame.add(backButton);
 
-        frame.setSize(580, 480);
+        frame.setSize(800, 600);
+    }
+    
+    @Override
+    protected void setupFrame() {
+        if (frame != null) {
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.setExtendedState(JFrame.MAXIMIZED_BOTH); // Start maximized
+            frame.setVisible(true);
+            frame.setLocationRelativeTo(null); // Center on screen
+        }
     }
 
     private void loadCurrentSettings() {
