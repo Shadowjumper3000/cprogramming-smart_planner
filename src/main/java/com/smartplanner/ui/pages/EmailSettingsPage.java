@@ -80,11 +80,17 @@ public class EmailSettingsPage extends BasePage implements ActionListener {
     }
 
     private void setupLayout() {
-        frame.setLayout(null);
+        frame.setLayout(new BorderLayout(10, 10));
+
+        // Main content panel
+        JPanel contentPanel = new JPanel();
+        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
+        contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50));
 
         // Title
-        titleLabel.setBounds(50, 20, 400, 30);
-        frame.add(titleLabel);
+        titleLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        contentPanel.add(titleLabel);
+        contentPanel.add(Box.createVerticalStrut(10));
 
         // Instructions panel
         JTextArea instructions = new JTextArea(
@@ -94,99 +100,131 @@ public class EmailSettingsPage extends BasePage implements ActionListener {
             "3. Password: Your regular email password\n\n" +
             "Default settings work for most email providers!"
         );
-        instructions.setBounds(50, 60, 480, 120);
         instructions.setEditable(false);
         instructions.setBackground(new Color(255, 255, 200));
         instructions.setFont(new Font("Arial", Font.PLAIN, 11));
-        instructions.setBorder(BorderFactory.createLineBorder(Color.GRAY));
-        frame.add(instructions);
+        instructions.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(Color.GRAY),
+            BorderFactory.createEmptyBorder(10, 10, 10, 10)
+        ));
+        instructions.setMaximumSize(new Dimension(550, 120));
+        instructions.setAlignmentX(Component.LEFT_ALIGNMENT);
+        contentPanel.add(instructions);
+        contentPanel.add(Box.createVerticalStrut(20));
 
-        // Your Email (simplified - combines username and from)
+        // Simple form fields
+        JPanel formPanel = new JPanel(new GridBagLayout());
+        formPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        formPanel.setMaximumSize(new Dimension(550, 150));
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+
+        // Your Email
+        gbc.gridx = 0; gbc.gridy = 0; gbc.weightx = 0;
         JLabel yourEmailLabel = new JLabel("Your Email:");
-        yourEmailLabel.setBounds(50, 195, 150, 25);
         yourEmailLabel.setFont(new Font("Arial", Font.BOLD, 12));
-        frame.add(yourEmailLabel);
-        
-        fromEmailField.setBounds(200, 195, 330, 25);
-        frame.add(fromEmailField);
+        formPanel.add(yourEmailLabel, gbc);
+        gbc.gridx = 1; gbc.weightx = 1;
+        fromEmailField.setPreferredSize(new Dimension(300, 25));
+        formPanel.add(fromEmailField, gbc);
 
-        // Send To Email
+        // Send To
+        gbc.gridx = 0; gbc.gridy = 1; gbc.weightx = 0;
         JLabel sendToLabel = new JLabel("Send Reminders To:");
-        sendToLabel.setBounds(50, 230, 150, 25);
         sendToLabel.setFont(new Font("Arial", Font.BOLD, 12));
-        frame.add(sendToLabel);
-        
-        toEmailField.setBounds(200, 230, 330, 25);
-        frame.add(toEmailField);
+        formPanel.add(sendToLabel, gbc);
+        gbc.gridx = 1; gbc.weightx = 1;
+        toEmailField.setPreferredSize(new Dimension(300, 25));
+        formPanel.add(toEmailField, gbc);
 
         // Password
+        gbc.gridx = 0; gbc.gridy = 2; gbc.weightx = 0;
         JLabel passLabel = new JLabel("Email Password:");
-        passLabel.setBounds(50, 265, 150, 25);
         passLabel.setFont(new Font("Arial", Font.BOLD, 12));
-        frame.add(passLabel);
-        
-        passwordField.setBounds(200, 265, 330, 25);
-        frame.add(passwordField);
+        formPanel.add(passLabel, gbc);
+        gbc.gridx = 1; gbc.weightx = 1;
+        passwordField.setPreferredSize(new Dimension(300, 25));
+        formPanel.add(passwordField, gbc);
+
+        contentPanel.add(formPanel);
+        contentPanel.add(Box.createVerticalStrut(15));
 
         // Advanced settings toggle
         JButton advancedButton = new JButton("▼ Advanced Settings");
-        advancedButton.setBounds(50, 305, 180, 30);
         advancedButton.setFocusable(false);
-        
-        JPanel advancedPanel = new JPanel(null);
-        advancedPanel.setBounds(50, 345, 480, 130);
+        advancedButton.setAlignmentX(Component.LEFT_ALIGNMENT);
+        contentPanel.add(advancedButton);
+        contentPanel.add(Box.createVerticalStrut(10));
+
+        // Advanced panel
+        JPanel advancedPanel = new JPanel(new GridBagLayout());
         advancedPanel.setBorder(BorderFactory.createTitledBorder("Advanced"));
+        advancedPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        advancedPanel.setMaximumSize(new Dimension(550, 150));
         advancedPanel.setVisible(false);
 
-        // SMTP Host (in advanced)
-        smtpHostLabel.setBounds(10, 25, 100, 25);
-        smtpHostField.setBounds(120, 25, 200, 25);
-        advancedPanel.add(smtpHostLabel);
-        advancedPanel.add(smtpHostField);
+        GridBagConstraints advGbc = new GridBagConstraints();
+        advGbc.insets = new Insets(5, 5, 5, 5);
+        advGbc.anchor = GridBagConstraints.WEST;
+        advGbc.fill = GridBagConstraints.HORIZONTAL;
 
-        // SMTP Port (in advanced)
-        smtpPortLabel.setBounds(10, 60, 100, 25);
-        smtpPortField.setBounds(120, 60, 80, 25);
-        advancedPanel.add(smtpPortLabel);
-        advancedPanel.add(smtpPortField);
+        // SMTP Host
+        advGbc.gridx = 0; advGbc.gridy = 0; advGbc.weightx = 0;
+        advancedPanel.add(smtpHostLabel, advGbc);
+        advGbc.gridx = 1; advGbc.weightx = 1;
+        smtpHostField.setPreferredSize(new Dimension(200, 25));
+        advancedPanel.add(smtpHostField, advGbc);
 
-        // Username (in advanced, hidden by default)
-        usernameLabel.setBounds(10, 95, 100, 25);
-        usernameField.setBounds(120, 95, 200, 25);
-        advancedPanel.add(usernameLabel);
-        advancedPanel.add(usernameField);
+        // SMTP Port
+        advGbc.gridx = 0; advGbc.gridy = 1; advGbc.weightx = 0;
+        advancedPanel.add(smtpPortLabel, advGbc);
+        advGbc.gridx = 1; advGbc.weightx = 0;
+        smtpPortField.setPreferredSize(new Dimension(80, 25));
+        advancedPanel.add(smtpPortField, advGbc);
 
-        // Use TLS (in advanced)
-        useTLSLabel.setBounds(240, 60, 80, 25);
-        useTLSCheckbox.setBounds(320, 60, 25, 25);
-        advancedPanel.add(useTLSLabel);
-        advancedPanel.add(useTLSCheckbox);
+        // Use TLS
+        advGbc.gridx = 2; advGbc.weightx = 0;
+        advancedPanel.add(useTLSLabel, advGbc);
+        advGbc.gridx = 3;
+        advancedPanel.add(useTLSCheckbox, advGbc);
+
+        // Username
+        advGbc.gridx = 0; advGbc.gridy = 2; advGbc.weightx = 0;
+        advancedPanel.add(usernameLabel, advGbc);
+        advGbc.gridx = 1; advGbc.weightx = 1; advGbc.gridwidth = 3;
+        usernameField.setPreferredSize(new Dimension(200, 25));
+        advancedPanel.add(usernameField, advGbc);
 
         advancedButton.addActionListener(e -> {
-            advancedPanel.setVisible(!advancedPanel.isVisible());
-            advancedButton.setText(advancedPanel.isVisible() ? "▲ Advanced Settings" : "▼ Advanced Settings");
-            // No need to resize - frame is resizable and maximized
+            boolean isVisible = !advancedPanel.isVisible();
+            advancedPanel.setVisible(isVisible);
+            advancedButton.setText(isVisible ? "▲ Advanced Settings" : "▼ Advanced Settings");
+            frame.pack();
+            frame.setSize(600, isVisible ? 600 : 480);
         });
 
-        frame.add(advancedButton);
-        frame.add(advancedPanel);
+        contentPanel.add(advancedPanel);
+        contentPanel.add(Box.createVerticalStrut(20));
 
-        // Buttons
-        saveButton.setBounds(50, 345, 130, 35);
-        testButton.setBounds(190, 345, 150, 35);
-        backButton.setBounds(350, 345, 100, 35);
-        frame.add(saveButton);
-        frame.add(testButton);
-        frame.add(backButton);
+        // Buttons panel
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
+        buttonPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        buttonPanel.add(saveButton);
+        buttonPanel.add(testButton);
+        buttonPanel.add(backButton);
+        
+        contentPanel.add(buttonPanel);
 
-        frame.setSize(800, 600);
+        frame.add(contentPanel, BorderLayout.CENTER);
+        frame.setSize(600, 480);
     }
     
     @Override
     protected void setupFrame() {
         if (frame != null) {
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.setExtendedState(JFrame.MAXIMIZED_BOTH); // Start maximized
             frame.setVisible(true);
             frame.setLocationRelativeTo(null); // Center on screen
         }
