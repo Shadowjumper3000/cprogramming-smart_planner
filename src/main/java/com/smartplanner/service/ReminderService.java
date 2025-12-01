@@ -68,10 +68,12 @@ public class ReminderService {
    */
   private void checkAndSendReminders() {
     try {
+      // Reload tasks from file to get latest changes
+      plannerService.loadTasks();
       List<Task> tasks = plannerService.getAllTasks();
       LocalDateTime now = LocalDateTime.now();
       
-      System.out.println("Checking reminders at: " + now);
+      System.out.println("Checking reminders at: " + now + " | Total tasks: " + tasks.size());
 
       for (Task task : tasks) {
         // Skip if task is completed or reminder is not enabled
