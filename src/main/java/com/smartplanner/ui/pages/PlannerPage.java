@@ -26,6 +26,8 @@ public class PlannerPage extends BasePage implements ActionListener {
     private JTextField searchField;
     private JButton addButton, editButton, deleteButton, markCompleteButton, searchButton, refreshButton, reportButton, emailSettingsButton;
     private JCheckBox showCompletedCheckbox;
+    private JCheckBox emailReminderCheckbox;
+    private JComboBox<Integer> reminderMinutesComboBox;
 
     public PlannerPage(String userID) {
         this.userID = userID;
@@ -54,6 +56,12 @@ public class PlannerPage extends BasePage implements ActionListener {
         String[] priorities = { "High", "Medium", "Low" };
         priorityComboBox = new JComboBox<>(priorities);
         priorityComboBox.setSelectedItem("Medium");
+
+        // Email reminder components
+        emailReminderCheckbox = new JCheckBox("Enable Email Reminder");
+        Integer[] reminderOptions = { 5, 10, 15, 30, 60 };
+        reminderMinutesComboBox = new JComboBox<>(reminderOptions);
+        reminderMinutesComboBox.setSelectedItem(30);
 
         // Action buttons
         addButton = new JButton("Add Task");
@@ -148,6 +156,17 @@ public class PlannerPage extends BasePage implements ActionListener {
         formPanel.add(new JLabel("Due Time (HH:MM):"), gbc);
         gbc.gridx = 3;
         formPanel.add(dueTimeField, gbc);
+
+        // Fourth row - Email reminder
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        formPanel.add(emailReminderCheckbox, gbc);
+        gbc.gridx = 1;
+        JPanel reminderPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+        reminderPanel.add(new JLabel("Remind me"));
+        reminderPanel.add(reminderMinutesComboBox);
+        reminderPanel.add(new JLabel("minutes before"));
+        formPanel.add(reminderPanel, gbc);
 
         // Buttons panel
         JPanel buttonPanel = new JPanel(new FlowLayout());
@@ -264,6 +283,8 @@ public class PlannerPage extends BasePage implements ActionListener {
         dueTimeField.setText("");
         categoryField.setText("");
         priorityComboBox.setSelectedItem("Medium");
+        emailReminderCheckbox.setSelected(false);
+        reminderMinutesComboBox.setSelectedItem(30);
     }
 
     private boolean isFormEmpty() {
@@ -284,6 +305,14 @@ public class PlannerPage extends BasePage implements ActionListener {
             dueTimeField.setText((String) tableModel.getValueAt(selectedRow, 3));
             priorityComboBox.setSelectedItem(tableModel.getValueAt(selectedRow, 4));
             categoryField.setText((String) tableModel.getValueAt(selectedRow, 6));
+            
+            // Load email reminder settings from the actual task object
+            List<Task> filteredTasks = getCurrentFilteredTasks();
+            if (selectedRow < filteredTasks.size()) {
+                Task task = filteredTasks.get(selectedRow);
+                emailReminderCheckbox.setSelected(task.isEmailReminderEnabled());
+                reminderMinutesComboBox.setSelectedItem(task.getReminderMinutesBefore());
+            }
         }
     }
 
@@ -318,6 +347,10 @@ public class PlannerPage extends BasePage implements ActionListener {
             }
         }
 
+        // Email reminder settings
+        task.setEmailReminderEnabled(emailReminderCheckbox.isSelected());
+        task.setReminderMinutesBefore((Integer) reminderMinutesComboBox.getSelectedItem());
+
         return task;
     }
 
@@ -327,33 +360,43 @@ public class PlannerPage extends BasePage implements ActionListener {
             frame.dispose();
             new MainPage(userID);
         } else if (e.getSource() == addButton) {
-            TaskReminderDialog dialog = new TaskReminderDialog(frame);
-            dialog.setVisible(true);
-            
-            if (dialog.isSaved()) {
-                Task task = dialog.getTask();
+            Task task = createTaskFromForm();
+            if (task != null && !task.getTitle().isEmpty()) {
                 plannerService.addTask(task);
                 clearForm();
                 loadTasksIntoTable();
                 JOptionPane.showMessageDialog(frame, "Task added successfully!", "Success",
                         JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(frame, "Please enter a task title.", "Error", JOptionPane.ERROR_MESSAGE);
             }
         } else if (e.getSource() == editButton) {
             int selectedRow = taskTable.getSelectedRow();
             if (selectedRow != -1) {
-                List<Task> filteredTasks = getCurrentFilteredTasks();
-                if (selectedRow < filteredTasks.size()) {
-                    Task taskToEdit = filteredTasks.get(selectedRow);
-                    TaskReminderDialog dialog = new TaskReminderDialog(frame, taskToEdit);
-                    dialog.setVisible(true);
-                    
-                    if (dialog.isSaved()) {
-                        Task updatedTask = dialog.getTask();
-                        plannerService.updateTask(updatedTask);
-                        clearForm();
-                        loadTasksIntoTable();
-                        JOptionPane.showMessageDialog(frame, "Task updated successfully!", "Success",
-                                JOptionPane.INFORMATION_MESSAGE);
+                // First, load the selected task into the form if it's empty
+                if (isFormEmpty()) {
+                    loadSelectedTaskIntoForm();
+                    JOptionPane.showMessageDialog(frame,
+                            "Task loaded into form. Make changes and click 'Edit Task' again to save.",
+                            "Edit Mode", JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    // Form has data, so update the selected task
+                    Task task = createTaskFromForm();
+                    if (task != null && !task.getTitle().isEmpty()) {
+                        List<Task> filteredTasks = getCurrentFilteredTasks();
+                        if (selectedRow < filteredTasks.size()) {
+                            Task originalTask = filteredTasks.get(selectedRow);
+                            task.setId(originalTask.getId());
+                            task.setCompleted(originalTask.isCompleted());
+                            plannerService.updateTask(task);
+                            clearForm();
+                            loadTasksIntoTable();
+                            JOptionPane.showMessageDialog(frame, "Task updated successfully!", "Success",
+                                    JOptionPane.INFORMATION_MESSAGE);
+                        }
+                    } else {
+                        JOptionPane.showMessageDialog(frame, "Please enter a task title.", "Error",
+                                JOptionPane.ERROR_MESSAGE);
                     }
                 }
             } else {
