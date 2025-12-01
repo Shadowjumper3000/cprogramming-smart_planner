@@ -157,14 +157,16 @@ public class PlannerPage extends BasePage implements ActionListener {
         gbc.gridx = 3;
         formPanel.add(dueTimeField, gbc);
 
-        // Fourth row - Email reminder (both on same row in grid)
+        // Fourth row - Email reminder (label on left, control on right in each column)
         gbc.gridx = 0;
         gbc.gridy = 3;
-        formPanel.add(emailReminderCheckbox, gbc);
+        formPanel.add(new JLabel("Enable Email Reminder:"), gbc);
         gbc.gridx = 1;
-        formPanel.add(reminderMinutesComboBox, gbc);
+        formPanel.add(emailReminderCheckbox, gbc);
         gbc.gridx = 2;
-        formPanel.add(new JLabel("minutes before"), gbc);
+        formPanel.add(new JLabel("Remind me (minutes before):"), gbc);
+        gbc.gridx = 3;
+        formPanel.add(reminderMinutesComboBox, gbc);
 
         // Buttons panel
         JPanel buttonPanel = new JPanel(new FlowLayout());
