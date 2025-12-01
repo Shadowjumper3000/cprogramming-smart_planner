@@ -32,14 +32,12 @@ public class ReminderService {
    */
   public void start() {
     if (isRunning) {
-      System.out.println("Reminder service is already running.");
       return;
     }
 
     isRunning = true;
     // Check for reminders every minute
     scheduler.scheduleAtFixedRate(this::checkAndSendReminders, 0, 1, TimeUnit.MINUTES);
-    System.out.println("Reminder service started.");
   }
 
   /**
@@ -60,7 +58,6 @@ public class ReminderService {
       scheduler.shutdownNow();
       Thread.currentThread().interrupt();
     }
-    System.out.println("Reminder service stopped.");
   }
 
   /**
@@ -72,8 +69,6 @@ public class ReminderService {
       plannerService.loadTasks();
       List<Task> tasks = plannerService.getAllTasks();
       LocalDateTime now = LocalDateTime.now();
-      
-      System.out.println("Checking reminders at: " + now + " | Total tasks: " + tasks.size());
 
       for (Task task : tasks) {
         // Skip if task is completed or reminder is not enabled
@@ -89,21 +84,16 @@ public class ReminderService {
         // Calculate when the task is due
         LocalDateTime taskDueTime = LocalDateTime.of(task.getDueDate(), task.getDueTime());
         
-        System.out.println("Task: " + task.getTitle() + " | Due: " + taskDueTime + " | Reminder enabled: " + task.isEmailReminderEnabled());
-        
         // Check 1: Send advance reminder (before deadline)
         LocalDateTime reminderTime = taskDueTime.minusMinutes(task.getReminderMinutesBefore());
         long minutesUntilReminder = ChronoUnit.MINUTES.between(now, reminderTime);
         String reminderKey = task.getId() + "_reminder_" + reminderTime.toString();
-        
-        System.out.println("  Advance reminder: " + minutesUntilReminder + " minutes until reminder time");
         
         if (minutesUntilReminder <= 0 && 
             minutesUntilReminder > -60 && // Don't send if more than 1 hour past reminder time
             !sentReminders.contains(reminderKey) &&
             taskDueTime.isAfter(now)) {
           
-          System.out.println("  -> Sending UPCOMING reminder!");
           sendReminder(task, "UPCOMING");
           sentReminders.add(reminderKey);
         }
@@ -112,13 +102,10 @@ public class ReminderService {
         long minutesUntilDeadline = ChronoUnit.MINUTES.between(now, taskDueTime);
         String deadlineKey = task.getId() + "_deadline_" + taskDueTime.toString();
         
-        System.out.println("  Deadline check: " + minutesUntilDeadline + " minutes until deadline | Already sent: " + sentReminders.contains(deadlineKey));
-        
         if (minutesUntilDeadline <= 0 && 
             minutesUntilDeadline > -60 && // Send within 1 hour after deadline
             !sentReminders.contains(deadlineKey)) {
           
-          System.out.println("  -> Sending DEADLINE reminder!");
           sendReminder(task, "DEADLINE");
           sentReminders.add(deadlineKey);
         }
@@ -128,8 +115,7 @@ public class ReminderService {
       cleanupSentReminders();
 
     } catch (Exception e) {
-      System.err.println("Error checking reminders: " + e.getMessage());
-      e.printStackTrace();
+      // Silently handle errors - service continues running
     }
   }
 
@@ -138,14 +124,9 @@ public class ReminderService {
    */
   private void sendReminder(Task task, String reminderType) {
     try {
-      boolean success = emailService.sendTaskReminder(task, reminderType);
-      if (success) {
-        System.out.println(reminderType + " reminder sent for task: " + task.getTitle());
-      } else {
-        System.err.println("Failed to send " + reminderType + " reminder for task: " + task.getTitle());
-      }
+      emailService.sendTaskReminder(task, reminderType);
     } catch (Exception e) {
-      System.err.println("Error sending " + reminderType + " reminder for task " + task.getTitle() + ": " + e.getMessage());
+      // Silently handle errors - service continues running
     }
   }
 

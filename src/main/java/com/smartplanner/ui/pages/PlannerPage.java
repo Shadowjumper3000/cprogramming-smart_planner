@@ -58,7 +58,7 @@ public class PlannerPage extends BasePage implements ActionListener {
         priorityComboBox.setSelectedItem("Medium");
 
         // Email reminder components
-        emailReminderCheckbox = new JCheckBox("Enable Email Reminder");
+        emailReminderCheckbox = new JCheckBox("");
         Integer[] reminderOptions = { 5, 10, 15, 30, 60 };
         reminderMinutesComboBox = new JComboBox<>(reminderOptions);
         reminderMinutesComboBox.setSelectedItem(30);
