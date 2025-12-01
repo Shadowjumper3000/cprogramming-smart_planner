@@ -33,13 +33,28 @@ public class EmailService {
    * Sends an email reminder for a task.
    */
   public boolean sendTaskReminder(Task task) {
+    return sendTaskReminder(task, "UPCOMING");
+  }
+
+  /**
+   * Sends an email reminder for a task with specific type.
+   */
+  public boolean sendTaskReminder(Task task, String reminderType) {
     if (!config.isValid()) {
       System.err.println("Email configuration is not valid. Please configure email settings.");
       return false;
     }
 
-    String subject = "SmartPlanner Reminder: " + task.getTitle();
-    String body = buildReminderEmailBody(task);
+    String subject;
+    String body;
+    
+    if ("DEADLINE".equals(reminderType)) {
+      subject = "⏰ DEADLINE NOW: " + task.getTitle();
+      body = buildDeadlineEmailBody(task);
+    } else {
+      subject = "SmartPlanner Reminder: " + task.getTitle();
+      body = buildReminderEmailBody(task);
+    }
 
     return sendEmail(subject, body);
   }
@@ -74,6 +89,42 @@ public class EmailService {
     body.append("\n=================================\n\n");
     body.append("This is an automated reminder from SmartPlanner.\n");
     body.append("Please complete your task on time!\n");
+
+    return body.toString();
+  }
+
+  /**
+   * Builds the email body for a deadline notification.
+   */
+  private String buildDeadlineEmailBody(Task task) {
+    StringBuilder body = new StringBuilder();
+    body.append("⏰ DEADLINE ALERT - SmartPlanner\n\n");
+    body.append("=================================\n\n");
+    body.append("🔴 YOUR TASK DEADLINE IS NOW! 🔴\n\n");
+    body.append("Title: ").append(task.getTitle()).append("\n");
+    
+    if (task.getDescription() != null && !task.getDescription().isEmpty()) {
+      body.append("Description: ").append(task.getDescription()).append("\n");
+    }
+    
+    if (task.getDueDate() != null) {
+      body.append("Due Date: ").append(task.getDueDate()).append("\n");
+    }
+    
+    if (task.getDueTime() != null) {
+      body.append("Due Time: ").append(task.getDueTime()).append("\n");
+    }
+    
+    body.append("Priority: ").append(task.getPriority()).append("\n");
+    
+    if (task.getCategory() != null && !task.getCategory().isEmpty()) {
+      body.append("Category: ").append(task.getCategory()).append("\n");
+    }
+    
+    body.append("\n=================================\n\n");
+    body.append("⚠️ This task is due RIGHT NOW!\n");
+    body.append("Complete it immediately to avoid being late!\n\n");
+    body.append("This is an automated deadline notification from SmartPlanner.\n");
 
     return body.toString();
   }
