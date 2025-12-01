@@ -24,8 +24,10 @@ public class PlannerPage extends BasePage implements ActionListener {
     private JTextField titleField, descriptionField, dueDateField, dueTimeField, categoryField;
     private JComboBox<String> priorityComboBox, filterComboBox;
     private JTextField searchField;
-    private JButton addButton, editButton, deleteButton, markCompleteButton, searchButton, refreshButton, reportButton;
+    private JButton addButton, editButton, deleteButton, markCompleteButton, searchButton, refreshButton, reportButton, emailSettingsButton;
     private JCheckBox showCompletedCheckbox;
+    private JCheckBox emailReminderCheckbox;
+    private JComboBox<Integer> reminderMinutesComboBox;
 
     public PlannerPage(String userID) {
         this.userID = userID;
@@ -55,6 +57,12 @@ public class PlannerPage extends BasePage implements ActionListener {
         priorityComboBox = new JComboBox<>(priorities);
         priorityComboBox.setSelectedItem("Medium");
 
+        // Email reminder components
+        emailReminderCheckbox = new JCheckBox("");
+        Integer[] reminderOptions = { 5, 10, 15, 30, 60 };
+        reminderMinutesComboBox = new JComboBox<>(reminderOptions);
+        reminderMinutesComboBox.setSelectedItem(30);
+
         // Action buttons
         addButton = new JButton("Add Task");
         editButton = new JButton("Edit Task");
@@ -62,6 +70,7 @@ public class PlannerPage extends BasePage implements ActionListener {
         markCompleteButton = new JButton("Toggle Complete");
         refreshButton = new JButton("Refresh");
         reportButton = new JButton("Generate Report");
+        emailSettingsButton = new JButton("Email Settings");
 
         // Search and filter components
         searchField = new JTextField(15);
@@ -100,6 +109,7 @@ public class PlannerPage extends BasePage implements ActionListener {
         searchButton.addActionListener(this);
         refreshButton.addActionListener(this);
         reportButton.addActionListener(e -> new ReportPage(userID));
+        emailSettingsButton.addActionListener(this);
         filterComboBox.addActionListener(this);
         showCompletedCheckbox.addActionListener(this);
     }
@@ -147,6 +157,17 @@ public class PlannerPage extends BasePage implements ActionListener {
         gbc.gridx = 3;
         formPanel.add(dueTimeField, gbc);
 
+        // Fourth row - Email reminder (label on left, control on right in each column)
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        formPanel.add(new JLabel("Enable Email Reminder:"), gbc);
+        gbc.gridx = 1;
+        formPanel.add(emailReminderCheckbox, gbc);
+        gbc.gridx = 2;
+        formPanel.add(new JLabel("Remind me (minutes before):"), gbc);
+        gbc.gridx = 3;
+        formPanel.add(reminderMinutesComboBox, gbc);
+
         // Buttons panel
         JPanel buttonPanel = new JPanel(new FlowLayout());
         buttonPanel.add(addButton);
@@ -155,6 +176,7 @@ public class PlannerPage extends BasePage implements ActionListener {
         buttonPanel.add(markCompleteButton);
         buttonPanel.add(refreshButton);
         buttonPanel.add(reportButton);
+        buttonPanel.add(emailSettingsButton);
 
         // Search and filter panel
         JPanel searchPanel = new JPanel(new FlowLayout());
@@ -261,6 +283,8 @@ public class PlannerPage extends BasePage implements ActionListener {
         dueTimeField.setText("");
         categoryField.setText("");
         priorityComboBox.setSelectedItem("Medium");
+        emailReminderCheckbox.setSelected(false);
+        reminderMinutesComboBox.setSelectedItem(30);
     }
 
     private boolean isFormEmpty() {
@@ -281,6 +305,14 @@ public class PlannerPage extends BasePage implements ActionListener {
             dueTimeField.setText((String) tableModel.getValueAt(selectedRow, 3));
             priorityComboBox.setSelectedItem(tableModel.getValueAt(selectedRow, 4));
             categoryField.setText((String) tableModel.getValueAt(selectedRow, 6));
+            
+            // Load email reminder settings from the actual task object
+            List<Task> filteredTasks = getCurrentFilteredTasks();
+            if (selectedRow < filteredTasks.size()) {
+                Task task = filteredTasks.get(selectedRow);
+                emailReminderCheckbox.setSelected(task.isEmailReminderEnabled());
+                reminderMinutesComboBox.setSelectedItem(task.getReminderMinutesBefore());
+            }
         }
     }
 
@@ -314,6 +346,10 @@ public class PlannerPage extends BasePage implements ActionListener {
                 return null;
             }
         }
+
+        // Email reminder settings
+        task.setEmailReminderEnabled(emailReminderCheckbox.isSelected());
+        task.setReminderMinutesBefore((Integer) reminderMinutesComboBox.getSelectedItem());
 
         return task;
     }
@@ -429,6 +465,9 @@ public class PlannerPage extends BasePage implements ActionListener {
             plannerService.loadTasks();
             searchField.setText("");
             loadTasksIntoTable();
+        } else if (e.getSource() == emailSettingsButton) {
+            new EmailSettingsPage(userID);
+            frame.dispose();
         } else if (e.getSource() == filterComboBox || e.getSource() == showCompletedCheckbox) {
             loadTasksIntoTable();
         }

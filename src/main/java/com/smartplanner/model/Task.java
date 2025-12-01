@@ -16,11 +16,15 @@ public class Task {
   private boolean completed;
   private boolean isLate;
   private String category;
+  private boolean emailReminderEnabled;
+  private int reminderMinutesBefore; // Minutes before due time to send reminder
 
   public Task() {
     this.completed = false;
     this.isLate = false;
     this.priority = "Medium";
+    this.emailReminderEnabled = false;
+    this.reminderMinutesBefore = 30; // Default 30 minutes before
   }
 
   public Task(String id, String title, String description, LocalDate dueDate,
@@ -105,6 +109,22 @@ public class Task {
     this.category = category;
   }
 
+  public boolean isEmailReminderEnabled() {
+    return emailReminderEnabled;
+  }
+
+  public void setEmailReminderEnabled(boolean emailReminderEnabled) {
+    this.emailReminderEnabled = emailReminderEnabled;
+  }
+
+  public int getReminderMinutesBefore() {
+    return reminderMinutesBefore;
+  }
+
+  public void setReminderMinutesBefore(int reminderMinutesBefore) {
+    this.reminderMinutesBefore = reminderMinutesBefore;
+  }
+
   /**
    * Converts the task to CSV format for file storage.
    */
@@ -117,7 +137,9 @@ public class Task {
         dueTime != null ? dueTime.toString() : "",
         priority != null ? priority : "Medium",
         String.valueOf(completed),
-        category != null ? category : "");
+        category != null ? category : "",
+        String.valueOf(emailReminderEnabled),
+        String.valueOf(reminderMinutesBefore));
   }
 
   /**
@@ -145,6 +167,14 @@ public class Task {
     task.setPriority(parts[5].trim().isEmpty() ? "Medium" : parts[5].trim());
     task.setCompleted(Boolean.parseBoolean(parts[6].trim()));
     task.setCategory(parts[7].trim());
+
+    // Load reminder fields if present (for backwards compatibility)
+    if (parts.length > 8 && !parts[8].trim().isEmpty()) {
+      task.setEmailReminderEnabled(Boolean.parseBoolean(parts[8].trim()));
+    }
+    if (parts.length > 9 && !parts[9].trim().isEmpty()) {
+      task.setReminderMinutesBefore(Integer.parseInt(parts[9].trim()));
+    }
 
     return task;
   }
