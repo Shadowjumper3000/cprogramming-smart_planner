@@ -45,18 +45,24 @@ public class EmailService {
       return false;
     }
 
-    String subject;
-    String body;
-    
-    if ("DEADLINE".equals(reminderType)) {
-      subject = "⏰ DEADLINE NOW: " + task.getTitle();
-      body = buildDeadlineEmailBody(task);
-    } else {
-      subject = "SmartPlanner Reminder: " + task.getTitle();
-      body = buildReminderEmailBody(task);
-    }
+    try {
+      String subject;
+      String body;
+      
+      if ("DEADLINE".equals(reminderType)) {
+        subject = "⏰ DEADLINE NOW: " + task.getTitle();
+        body = buildDeadlineEmailBody(task);
+      } else {
+        subject = "SmartPlanner Reminder: " + task.getTitle();
+        body = buildReminderEmailBody(task);
+      }
 
-    return sendEmail(subject, body);
+      return sendEmail(subject, body);
+    } catch (Exception e) {
+      System.err.println("Failed to send task reminder: " + e.getMessage());
+      e.printStackTrace();
+      return false;
+    }
   }
 
   /**
@@ -199,10 +205,15 @@ public class EmailService {
    * Tests the email configuration by sending a test email.
    */
   public boolean sendTestEmail() {
-    String subject = "SmartPlanner Email Test";
-    String body = "This is a test email from SmartPlanner.\n\n" +
-                  "If you received this, your email configuration is working correctly!";
-    return sendEmail(subject, body);
+    try {
+      String subject = "SmartPlanner Email Test";
+      String body = "This is a test email from SmartPlanner.\n\n" +
+                    "If you received this, your email configuration is working correctly!";
+      return sendEmail(subject, body);
+    } catch (Exception e) {
+      System.err.println("Test email failed: " + e.getMessage());
+      throw e; // Re-throw for UI to catch
+    }
   }
 
   public EmailConfig getConfig() {
