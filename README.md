@@ -273,12 +273,59 @@ mvn compile
 # Run tests
 mvn test
 
+# Run specific test class
+mvn test -Dtest=TaskTest
+
+# Run tests with coverage (requires jacoco plugin)
+mvn test jacoco:report
+
 # Package as JAR
 mvn package
 
 # Clean build artifacts
 mvn clean
+
+# Clean, compile and test
+mvn clean test
 ```
+
+### Test Structure
+
+The project includes comprehensive JUnit 5 tests covering:
+
+- **Model Tests**: `Task`, `TimeTableEntry`, `TaskReport`
+- **Service Tests**: `PlannerService`, `TimeTableService`
+- **Authentication Tests**: `AuthenticationManager`
+- **Data Tests**: `FileManager`
+- **Utility Tests**: `CryptoUtils`, `DateFormatValidator`
+
+Test files are located in `src/test/java/com/smartplanner/` with the same package structure as the main source.
+
+#### Test Coverage
+
+- **Models**: Full coverage of getters, setters, CSV serialization/deserialization
+- **Services**: CRUD operations, filtering, searching, data persistence
+- **Authentication**: Credential validation, encryption/decryption
+- **Utilities**: Caesar cipher encryption with various inputs
+- **File Management**: File creation and initialization
+
+#### Running Tests
+
+```bash
+# Run all tests
+mvn test
+
+# Run tests with detailed output
+mvn test -Dtest=SmartPlannerTestSuite
+
+# Run a specific test class
+mvn test -Dtest=TaskTest
+
+# Run a specific test method
+mvn test -Dtest=TaskTest#testDefaultConstructor
+```
+
+Test results are generated in `target/surefire-reports/`.
 
 ### Adding New Features
 
@@ -286,6 +333,15 @@ mvn clean
 2. **Services**: Add business logic to `src/main/java/com/smartplanner/service/`
 3. **UI**: Add pages to `src/main/java/com/smartplanner/ui/pages/`
 4. **Data Storage**: Update `FileManager` and service classes for new CSV files
+5. **Tests**: Add corresponding test classes in `src/test/java/com/smartplanner/`
+
+### Testing Best Practices
+
+- Write tests for all new features
+- Maintain test coverage above 70%
+- Use `@TempDir` for file system operations in tests
+- Mock external dependencies when appropriate
+- Follow the Arrange-Act-Assert pattern
 
 ## Troubleshooting
 
